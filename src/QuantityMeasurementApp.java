@@ -1,62 +1,61 @@
 public class QuantityMeasurementApp {
 
-    // ---------------- FEET CLASS ----------------
-    static class Feet {
-        private double value1;
-        private double value2;
+    // Supported units
+    enum Unit {
+        FEET,
+        INCH
+    }
 
-        public Feet(double value1, double value2) {
-            this.value1 = value1;
-            this.value2 = value2;
+    // ---------------- GENERIC CLASS (DRY PRINCIPLE) ----------------
+    static class QuantityLength {
+
+        private double value;
+        private Unit unit;
+
+        public QuantityLength(double value, Unit unit) {
+            this.value = value;
+            this.unit = unit;
         }
 
-        public boolean areEqual() {
+        // Convert everything to FEET (base unit)
+        private double toFeet() {
+            switch (unit) {
+                case FEET:
+                    return value;
+
+                case INCH:
+                    return value / 12.0;
+
+                default:
+                    throw new IllegalArgumentException("Unsupported unit");
+            }
+        }
+
+        // Equality check
+        public boolean areEqual(QuantityLength other) {
             double epsilon = 0.0001;
-            return Math.abs(value1 - value2) < epsilon;
+            return Math.abs(this.toFeet() - other.toFeet()) < epsilon;
         }
     }
 
-    // ---------------- INCH CLASS ----------------
-    static class Inch {
-        private double value1;
-        private double value2;
-
-        public Inch(double value1, double value2) {
-            this.value1 = value1;
-            this.value2 = value2;
-        }
-
-        public boolean areEqual() {
-            double epsilon = 0.0001;
-            return Math.abs(value1 - value2) < epsilon;
-        }
-    }
-
-    // Static method for Feet comparison
-    public static boolean compareFeet(double v1, double v2) {
-        Feet feet = new Feet(v1, v2);
-        return feet.areEqual();
-    }
-
-    // Static method for Inch comparison
-    public static boolean compareInch(double v1, double v2) {
-        Inch inch = new Inch(v1, v2);
-        return inch.areEqual();
+    // Static compare method (as per requirement style)
+    public static boolean compare(QuantityLength q1, QuantityLength q2) {
+        return q1.areEqual(q2);
     }
 
     // MAIN METHOD
     public static void main(String[] args) {
 
-        // Hard-coded values (as per UC2)
-        double feetValue1 = 5.0;
-        double feetValue2 = 5.0;
+        // Hard-coded values (UC3 requirement)
+        QuantityLength feet1 = new QuantityLength(5.0, Unit.FEET);
+        QuantityLength feet2 = new QuantityLength(5.0, Unit.FEET);
 
-        double inchValue1 = 12.0;
-        double inchValue2 = 12.0;
+        QuantityLength inch1 = new QuantityLength(12.0, Unit.INCH);
+        QuantityLength inch2 = new QuantityLength(12.0, Unit.INCH);
 
         // Comparisons
-        boolean feetResult = compareFeet(feetValue1, feetValue2);
-        boolean inchResult = compareInch(inchValue1, inchValue2);
+        boolean feetResult = compare(feet1, feet2);
+        boolean inchResult = compare(inch1, inch2);
 
         // Output
         System.out.println("Feet equal: " + feetResult);
